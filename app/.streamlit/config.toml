@@ -1,0 +1,8 @@
+# Tema vino tinto / borgona oscuro (presentacion GAC)
+[theme]
+base = "dark"
+primaryColor = "#D6335F"
+backgroundColor = "#150A10"
+secondaryBackgroundColor = "#221119"
+textColor = "#F3E6EA"
+font = "sans serif"
