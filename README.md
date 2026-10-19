@@ -1,7 +1,7 @@
 # GAC · Auditoría del Proceso Analítico
 
-Repositorio de auditoría del proyecto de analítica comercial de **GAC Motor — Plaza Angelópolis**.
-Agrupa en un solo lugar, organizado por etapa, todos los insumos y productos del proceso: datos limpios, notebook de trabajo, código del dashboard y documentación del pipeline.
+Repositorio de auditoría del proyecto de analítica comercial de **GAC Motor — Plaza Angelópolis** (socio formador: Grupo Autos del Centro).
+Agrupa en un solo lugar, organizado por etapa, todo el proceso: **datos crudos, datos limpios, notebooks de cada etapa, documentos entregables y código del dashboard**.
 
 **Dashboard desplegado (producto final):** https://dashboard-gac-53x7ncfkmh6t2yk75k7cmf.streamlit.app
 **Repo de despliegue del dashboard:** https://github.com/a01736195-bot/Dashboard-GAC
@@ -13,26 +13,24 @@ Agrupa en un solo lugar, organizado por etapa, todos los insumos y productos del
 ## 1. Mapa del proceso
 
 ```
-Fuente cruda (Excel de la plaza)
-        │
+Fuente cruda (exportaciones del Excel maestro de la plaza, 7 ago 2026)
+        │  data/raw/  — 21 hojas en CSV + 2 xlsx sin outliers
         ▼
-ETAPA I · Limpieza e integración ────────────────► data/  (CSVs depurados)
-        │
+ETAPA I · Limpieza e integración ────────────────► notebooks/etapa1_limpieza/
+        │  salida: data/  (9 CSVs depurados)
         ▼
-ETAPA II · Modelado predictivo ──────────────────► app/vistas_modelos.py
-  · Correlaciones                                    (secciones por pestaña)
-  · Regresión lineal simple y múltiple
+ETAPA II · Modelado predictivo ──────────────────► notebooks/etapa2_modelado/
+  · Correlaciones, regresión lineal simple y múltiple
   · Regresión del embudo
-  · Regresión logística (PDM y Ventas)
+  · Regresión logística (PDM y Ventas, con balanceo)
         │
         ▼
-ETAPA III · ANOVA ───────────────────────────────► app/vistas_modelos.py
-  · Citas Digital por agente BDC                     (pestaña ANOVA)
-  · Marketing por canal
-  · Plazas
+ETAPA III · ANOVA ───────────────────────────────► notebooks/etapa3_anova/
+  · Citas Digital por agente BDC
+  · Marketing por canal · Plazas
         │
         ▼
-PRODUCTO · Dashboard Streamlit ──────────────────► app/app.py + app/vistas_modelos.py
+PRODUCTO · Dashboard Streamlit ──────────────────► app/  (app.py + vistas_modelos.py)
   5 vistas: Panorama, Embudo, Desempeño,
   Modelos Predictivos y Laboratorio
 ```
@@ -41,11 +39,23 @@ PRODUCTO · Dashboard Streamlit ────────────────
 
 | Carpeta | Contenido |
 |---|---|
-| `data/` | Los 9 CSV depurados que alimentan el dashboard y los modelos |
+| `data/raw/` | **Fuente cruda**: 21 hojas del Excel maestro "Analisis GAC Full 7 agosto 2026" exportadas a CSV, más `Ventas_por_Asesor_sin_outliers.xlsx` y `Analisis_de_Piso_sin_outliers.xlsx` |
+| `data/` | Los 9 CSV **depurados** que alimentan el dashboard y los modelos |
+| `notebooks/etapa1_limpieza/` | `Pipeline GAC - Entregable 1.ipynb` · `Analisis_GAC_Limpieza_Graficos.ipynb` |
+| `notebooks/etapa2_modelado/` | `Regresiones_GAC_Full.ipynb` (carga las 7 bases) · `Regresion_Simple_Resumen.ipynb` · `regresion_lineal_simple.ipynb` · `Regresion_Logistica_Binaria_Resumen.ipynb` (Ventas) · `reglog_e5.ipynb` (PDM con oversampling) |
+| `notebooks/etapa3_anova/` | `ANOVA_Marketing_GAC.ipynb` · `Copia de Despliegue_ANOVA.ipynb` |
+| `notebooks/exploracion/` | `analisis_GAC_oficial.ipynb` · `codigos.ipynb` (exploraciones previas) |
 | `notebooks/` | `DASHBOARD_GAC.ipynb` — análisis univariado + regresión (despliegue) |
-| `app/` | Código completo del dashboard: `app.py`, `vistas_modelos.py`, tema, requirements y versión original por etapas (`archivo/`) |
+| `docs/` | Entregables: reporte de solución, propuestas y presentaciones (ver §4) |
+| `app/` | Código del dashboard: `app.py`, `vistas_modelos.py`, tema, requirements y versión original por etapas (`archivo/`) |
 
-## 3. Diccionario de datos (`data/`)
+## 3. Diccionario de datos
+
+### 3.1 Crudos (`data/raw/`)
+
+Hojas del libro maestro de la plaza: `SDC`, `Resumen`, `Citas Digital`, `Ventas por Asesor`, `Ventas`, `Analisis de Piso`, `Base de Leads`, `Base de Tlaxcala`, `Plazas`, `Funnel`, `Marketing`, `MKT Digital`, `Leads por Canal`, `Principales Canales`, `CPL FACEBOOK`, `Conversaciones por Asesor`, `TOPS MKT`, `TOPS POST VENTA`, `TOPS TDH`, `TOPS VENTAS`, `BCS`.
+
+### 3.2 Depurados (`data/`)
 
 | Archivo | Filas × cols | Qué contiene | Usado en |
 |---|---|---|---|
@@ -59,28 +69,37 @@ PRODUCTO · Dashboard Streamlit ────────────────
 | `bcs_modelos.csv` | 6 × 3 | Objetivo vs ventas reales por modelo BCS | Desempeño · Productos |
 | `funnel_mensual.csv` | 18 × 11 | Embudo mensual por etapas (18 meses): leads → ventas | Embudo · Reg. del embudo |
 
-## 4. Cómo auditar
+## 4. Documentos entregables (`docs/`)
 
-1. **Trazabilidad de cifras:** cualquier número del dashboard se puede rastrear a un CSV de `data/`; el sidebar de la app muestra el conteo de registros de cada fuente.
+| Documento | Descripción |
+|---|---|
+| `Reporte de solución — Empresa del reto GAC.docx` | Reporte de solución de la empresa del reto |
+| `Propuesta_GAC_Analisis_Predictivo.pptx` | Propuesta de análisis predictivo |
+| `GAC Motor — Propuesta final (identidad GAC).pptx` / `GAC_Propuesta_Final.pdf` | Propuesta final (pptx editable + pdf) |
+| `GAC — Diapositivas adicionales (embudo, modelo y gestión).pptx` | Diapositivas de apoyo |
+| `Actividad 4 — Despliegue ANOVA (GAC).pptx` | Presentación del despliegue ANOVA (Etapa III) |
+| `Proceso_de_Presentaciones_GAC.docx` | Proceso de presentaciones |
+| `Regresion_GAC_en_ipynb.docx` | Documentación de la regresión |
+| `GAC Dashboard Context.docx` | Contexto del dashboard |
+| `Propuesta GAC.pdf` / `gac final.pdf` | Propuestas en pdf |
+
+## 5. Cómo auditar
+
+1. **Trazabilidad punta a punta:** cualquier cifra del dashboard → CSV depurado en `data/` → hoja cruda en `data/raw/` → transformación en el notebook de la etapa correspondiente.
 2. **Reproducir el dashboard localmente:**
    ```bash
    pip install -r app/requirements.txt
    cd app && streamlit run app.py
    ```
    (Para correrlo tal cual, los CSV de `data/` deben estar junto a `app.py`, como en el repo de despliegue.)
-3. **Modelos y ANOVA:** cada pestaña de la vista *Modelos Predictivos* muestra limpieza aplicada, hipótesis, estadísticos (F, p-valor, η², Levene) y hallazgo en lenguaje de negocio.
+3. **Modelos y ANOVA:** cada pestaña de la vista *Modelos Predictivos* muestra limpieza aplicada, hipótesis, estadísticos (F, p-valor, η², Levene) y hallazgo en lenguaje de negocio; los notebooks de etapa 2 y 3 son la evidencia de respaldo.
 4. **Versión original por etapas:** `app/archivo/app_etapas_original.py` conserva la primera versión del análisis para comparar contra la versión final.
 
-## 5. Material pendiente de integrar
+## 6. Notas y faltantes conocidos
 
-Los siguientes insumos existen pero aún no están en este repo (se generaron fuera de esta carpeta de trabajo):
-
-- [ ] Archivos **Excel originales** (fuente cruda entregada por la plaza)
-- [ ] Notebook de **Etapa I** — limpieza e integración
-- [ ] Notebook de **Etapa II** — modelado predictivo
-- [ ] Notebook de **Etapa III** — ANOVA
-
-Para integrarlos basta con copiarlos a la carpeta del proyecto; se agregan a `data/raw/` y `notebooks/` respectivamente y se actualiza esta lista.
+- El **libro Excel original** (`Analisis GAC Full7agosto 2026.xlsx`) no está como archivo único; su contenido está en `data/raw/` como exportaciones CSV por hoja.
+- El video `Actividad 4 — Despliegue ANOVA (GAC).mp4` no se incluye por tamaño; está la presentación pptx equivalente en `docs/`.
+- Se conservó la versión más reciente de cada documento duplicado (`-2`, `(1)`).
 
 ---
 
